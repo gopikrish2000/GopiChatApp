@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Hello world</title>
+   </head>
+
+   <script src = "/socket.io/socket.io.js"></script>
+   
+   <script>
+      // var socket = io('/firstNameSpace');
+      var socket = io();
+      socket.on('message', function(data){document.write(data)});
+
+      socket.on('broadcast', function(data){
+       document.write(data.description);
+      });
+
+      socket.on('serverEvent', function(data){
+      	document.write(data.name);
+      });
+
+      setTimeout(function(data){
+      	// socket.send('Gopi Client is sending message after 8sec ');
+      	socket.emit('clientEvent', {clientId:2, message:"client gopi sending"});
+      }, 8000);
+   </script>
+
+   <!--document.body.innerHTML = data.message-->
+
+   <body>Hello world123</body>
+</html>
