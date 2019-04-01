@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Application</title>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+        var socket = io();
+        var currentSocketId = "";
+        socket.on('serverEvent', function(data) {
+           // document.write('serverEvent data is '+ data.msg);
+           alert(data.msg);
+        });
+
+        socket.on('userLoggedIn', function(data) {
+            if(data.status == 'success') {
+                document.getElementById('userNameTv').style.display = "none";
+                document.getElementById('checkLogin').style.display = "none";
+                document.getElementById('afterLoginContainer').style.display = "block";
+                document.getElementById('userLoginContainer').innerHTML = "Welcome user " + data.userName;
+                currentSocketId = data.socketId;
+            }
+        });
+
+        socket.on('messageBroadcast',function(data) {
+            document.getElementById('content').appendChild(document.createTextNode(""+ data.userName + " : " + data.message));
+        })
+
+        function buttonClicked(){
+             // alert('clicked');
+             var userName = document.getElementById('userNameTv').value;
+             if(!isBlank(userName)){
+                // alert('nonempty ' + userName);
+
+                socket.emit('userEntered', {userName: userName});
+             } else {
+                alert('enter nonempty valid userName');
+             }
+        }
+
+        function isBlank(str) {
+            return (!str || /^\s*$/.test(str));
+        }
+
+        function sendMessage(){
+            var message = document.getElementById('messageTv').value;
+            if(!isBlank(message)){
+                socket.emit('clientMessageSent', {sendBy: currentSocketId, message: message});
+            }
+
+        }
+
+    </script>
+
+</head>
+
+<body>
+
+    <input type="text" title="userName" id="userNameTv" placeholder = "Enter your name!" />
+    <button type="button" id="checkLogin" onclick="buttonClicked()">Check login btn</button>
+    <div id="userLoginContainer" >
+    </div>
+    <div  id="afterLoginContainer" style="display:none">
+        <input type="text" placeholder="sendMessage" id="messageTv" />
+        <button type="button" id="sendMessage" onclick="sendMessage()">Send Message</button>
+    </div>
+    <div id="content">
+
+    </div>
+
+
+</body>
+
+</html>
